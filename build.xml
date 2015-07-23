@@ -46,7 +46,7 @@
     </java>
   </target>
 
-    <target name="play" depends="compile"
+    <target name="run" depends="compile"
             description="tests Mario whether it works" >
         <!-- Create the distribution directory -->
         <java classname="ch.idsia.scenarios.MainRun" dir="${build}" failonerror="false" fork="true">
