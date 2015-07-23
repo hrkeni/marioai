@@ -14,7 +14,7 @@ public class AStarAgent extends BasicAIAgent implements Agent {
         super("AStarAgent");
         reset();
     }
-
+/*comment*/
     @Override
     public void reset() {
         action = new boolean[Environment.numberOfButtons];
