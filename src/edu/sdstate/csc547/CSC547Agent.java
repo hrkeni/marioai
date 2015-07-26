@@ -119,7 +119,7 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
         boolean falling = previousY < observation.getMarioFloatPos()[1] && jumpReason.equals(JumpReason.NONE);
         action[Mario.KEY_LEFT] = falling && (gap || (enemyAbove && enemyinFront));
         action[Mario.KEY_JUMP] = jumpCount < jumpHeight && !jumpReason.equals(JumpReason.NONE);
-        action[Mario.KEY_SPEED] = !(observation.getMarioMode() != 2 && enemyinFront) && !(jumpReason.equals(JumpReason.ENEMY) && action[Mario.KEY_SPEED] && observation.getMarioMode() == 2);
+        action[Mario.KEY_SPEED] = !(observation.getMarioMode() != 2 && enemyinFront) && !(enemyinFront && action[Mario.KEY_SPEED] && observation.getMarioMode() == 2);
         action[Mario.KEY_RIGHT] = !falling && !(enemyAbove && jumpReason.equals(JumpReason.WALL)) && !(gap && !(jumpReason.equals(JumpReason.GAP) || jumpReason.equals(JumpReason.NONE)));
         previousX = observation.getMarioFloatPos()[0];
         previousY = observation.getMarioFloatPos()[1];
