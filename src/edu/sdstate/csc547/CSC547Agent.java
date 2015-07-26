@@ -6,6 +6,8 @@ import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.engine.sprites.Sprite;
 import ch.idsia.mario.environments.Environment;
 
+import java.util.Arrays;
+
 /**
  * Created by harshith on 7/23/15.
  */
@@ -37,7 +39,7 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
 
     private boolean detectGap(final byte[][] levelScene) {
         for (int y = 12; y < levelScene.length; y++) {
-            if (levelScene[y][12] != 0) {
+            if (levelScene[y][12] != 0 && levelScene[y][13] != 0) {
                 return false;
             }
         }
@@ -55,11 +57,10 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
         }
         return false;
     }
-
     private boolean detectEnemiesAbove(final byte[][] enemiesScene) {
 
-        for (int i = 12; i <= 18; i++) {
-            for (int j = 11; j<= 13; j++) {
+        for (int i = 5; i <= 11; i++) {
+            for (int j = 10; j<= 13; j++) {
                 if (enemiesScene[i][j] != Sprite.KIND_NONE && enemiesScene[i][j] != Sprite.KIND_FIREBALL) {
                     return true;
                 }
@@ -94,7 +95,12 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
         boolean enemyAbove = detectEnemiesAbove(enemiesScene);
         boolean gap = detectGap(levelScene);
         float speed = observation.getMarioFloatPos()[0] - previousX;
-//        System.out.println("Enemies: " +enemyDetected);
+//        System.out.println("Above: " +enemyAbove);
+//        if (enemyAbove) {
+//            for (int i = 0; i < 22; i++) {
+//                System.out.println(Arrays.toString(enemiesScene[i]));
+//            }
+//        }
         if ((observation.isMarioOnGround() || observation.mayMarioJump()) && !jumpReason.equals(JumpReason.NONE)) {
             jump(-1, JumpReason.NONE);
         }
@@ -113,8 +119,8 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
         boolean falling = previousY < observation.getMarioFloatPos()[1] && jumpReason.equals(JumpReason.NONE);
         action[Mario.KEY_LEFT] = falling && (gap || (enemyAbove && enemyinFront));
         action[Mario.KEY_JUMP] = jumpCount < jumpHeight && !jumpReason.equals(JumpReason.NONE);
-        action[Mario.KEY_SPEED] = !(observation.getMarioMode() == 2 && enemyinFront) && !(jumpReason.equals(JumpReason.ENEMY) && action[Mario.KEY_SPEED] && observation.getMarioMode() == 2);
-        action[Mario.KEY_RIGHT] = !falling && !(enemyAbove && jumpReason.equals(JumpReason.WALL));
+        action[Mario.KEY_SPEED] = !(observation.getMarioMode() != 2 && enemyinFront) && !(jumpReason.equals(JumpReason.ENEMY) && action[Mario.KEY_SPEED] && observation.getMarioMode() == 2);
+        action[Mario.KEY_RIGHT] = !falling && !(enemyAbove && jumpReason.equals(JumpReason.WALL)) && !(gap && !(jumpReason.equals(JumpReason.GAP) || jumpReason.equals(JumpReason.NONE)));
         previousX = observation.getMarioFloatPos()[0];
         previousY = observation.getMarioFloatPos()[1];
         return action;

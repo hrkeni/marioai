@@ -13,7 +13,6 @@ import ch.idsia.utils.StatisticalSummary;
 
 import java.util.List;
 
-import competition.cig.trondellingsen.TrondEllingsen_LuckyAgent;
 import edu.sdstate.csc547.CSC547Agent;
 
 /**
