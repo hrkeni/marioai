@@ -2,6 +2,7 @@ package ch.idsia.ai.agents.ai;
 
 import ch.idsia.ai.agents.Agent;
 import ch.idsia.mario.engine.sprites.Mario;
+import ch.idsia.mario.engine.sprites.Sprite;
 import ch.idsia.mario.environments.Environment;
 
 /**
@@ -19,34 +20,38 @@ public class ScaredAgent extends BasicAIAgent implements Agent {
     int trueJumpCounter = 0;
     int trueSpeedCounter = 0;
 
-    private boolean DangerOfGap(byte[][] levelScene)
-    {
-        for (int x = 9; x < 13; ++x)
-        {
-            boolean f = true;
-            for(int y = 12; y < 22; ++y)
-            {
-                if  (levelScene[y][x] != 0)
-                    f = false;
-            }
-            if (f && levelScene[12][11] != 0)
+    private boolean dangerExists(byte[][] levelScene, byte[][] enemiesScene) {
+        if (levelScene[11][12] != Sprite.KIND_NONE)
+            return true;
+        if (levelScene[12][12] == Sprite.KIND_NONE)
+            return true;
+        for (int i = 12; i < 15; i++) {
+            if (enemiesScene[11][i] != Sprite.KIND_NONE) {
+                System.out.println("Enemies scehe: 11," + i + ": " + enemiesScene[11][i]);
+                action[Mario.KEY_SPEED] = false;
                 return true;
+            }
+
         }
+
         return false;
     }
 
     public void reset() {
         action[Mario.KEY_RIGHT] = true;
-        action[Mario.KEY_SPEED] = false;
+        action[Mario.KEY_SPEED] = true;
     }
 
     public boolean[] getAction(Environment observation) {
         byte[][] levelScene = observation.getLevelSceneObservation(/*1*/);
-        if (/*levelScene[11][13] != 0 ||*/ levelScene[11][12] != 0 ||
-           /* levelScene[12][13] == 0 ||*/ levelScene[12][12] == 0 )
+        byte[][] enemiesScene = observation.getEnemiesObservation();
+        action[Mario.KEY_SPEED] = true;
+        if (dangerExists(levelScene, enemiesScene) )
         {
-            if (observation.mayMarioJump() || ( !observation.isMarioOnGround() && action[Mario.KEY_JUMP]))
-            {
+            if (observation.mayMarioJump()) {
+                action[Mario.KEY_JUMP] = true;
+                action[Mario.KEY_SPEED] = false;
+            } else if (!observation.isMarioOnGround() && action[Mario.KEY_JUMP]) {
                 action[Mario.KEY_JUMP] = true;
             }
             ++trueJumpCounter;
@@ -54,6 +59,7 @@ public class ScaredAgent extends BasicAIAgent implements Agent {
         else
         {
             action[Mario.KEY_JUMP] = false;
+//            action[Mario.KEY_SPEED] = false;
             trueJumpCounter = 0;
         }
 
@@ -61,6 +67,7 @@ public class ScaredAgent extends BasicAIAgent implements Agent {
         {
             trueJumpCounter = 0;
             action[Mario.KEY_JUMP] = false;
+//            action[Mario.KEY_SPEED] = true;
         }
 
         return action;

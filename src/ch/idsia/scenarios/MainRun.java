@@ -13,8 +13,8 @@ import ch.idsia.utils.StatisticalSummary;
 
 import java.util.List;
 
-import competition.cig.sergeykarakovskiy.SergeyKarakovskiy_JumpingAgent;
-import edu.sdstate.csc547.AStarAgent;
+import competition.cig.trondellingsen.TrondEllingsen_LuckyAgent;
+import edu.sdstate.csc547.CSC547Agent;
 
 /**
  * Created by IntelliJ IDEA.
@@ -75,7 +75,9 @@ public class MainRun
         //    AgentsPool.addAgent(new AStarAgent());
 //            AgentsPool.addAgent(new RjAgent());
 //            AgentsPool.addAgent(new SergeyKarakovskiy_JumpingAgent());
-            AgentsPool.addAgent(new AStarAgent());
+//            AgentsPool.addAgent(new AStarAgent());
+            AgentsPool.addAgent(new CSC547Agent());
+//            AgentsPool.addAgent(new TrondEllingsen_LuckyAgent());
         }
     }
 
@@ -103,10 +105,10 @@ public class MainRun
         timeLeftSum = 0;
         marioModeSum = 0;
 
+//        competitionScore += testConfig (controller, options, startingSeed, 0, false);
         competitionScore += testConfig (controller, options, startingSeed, 0, false);
-        competitionScore += testConfig (controller, options, startingSeed, 3, false);
-        competitionScore += testConfig (controller, options, startingSeed, 5, false);
-        competitionScore += testConfig (controller, options, startingSeed, 10, false);
+//        competitionScore += testConfig (controller, options, startingSeed, 5, false);
+//        competitionScore += testConfig (controller, options, startingSeed, 10, false);
         System.out.println("Competition score: " + competitionScore);
         System.out.println("Total kills Sum = " + killsSum);
         System.out.println("marioStatus Sum  = " + marioStatusSum);
