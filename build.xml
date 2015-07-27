@@ -18,6 +18,11 @@
         <exclude name="**/*.java"/>
       </fileset>
     </copy>
+  <copy todir="${build}/img">
+      <fileset dir="${src}/ch/idsia/mario/engine/resources">
+          <exclude name="**/*.java"/>
+      </fileset>
+  </copy>
                   
                   
   </target>
@@ -45,6 +50,17 @@
       </classpath>
     </java>
   </target>
+
+    <target name="jar" depends="compile"
+            description="creates .jar">
+        <jar destfile="marioai.jar">
+            <fileset dir="${build}"/>
+            <manifest>
+                <attribute name="Main-Class"
+                           value="ch.idsia.scenarios.Play"/>
+            </manifest>
+        </jar>
+    </target>
 
     <target name="run" depends="compile"
             description="tests Mario whether it works" >

@@ -3,3 +3,4 @@ classes/
 doc/
 out/
 .DS_Store
+*.jar
