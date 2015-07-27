@@ -6,16 +6,17 @@ import ch.idsia.mario.engine.sprites.Mario;
 import ch.idsia.mario.engine.sprites.Sprite;
 import ch.idsia.mario.environments.Environment;
 
-import java.util.Arrays;
-
 /**
  * Created by harshith on 7/23/15.
+ *
+ * Controller agent for the class project
  */
 public class CSC547Agent extends BasicAIAgent implements Agent {
 
     private enum JumpReason {
         NONE, WALL, ENEMY, GAP;
     }
+
     private int jumpCount = 0;
     private int jumpHeight = -1;
     private float previousY = 0f;
@@ -23,12 +24,19 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
 
     private JumpReason jumpReason = JumpReason.NONE;
 
-
+    /**
+     * Constructor
+     */
     public CSC547Agent() {
         super("CSC547Agent");
         reset();
     }
 
+    /**
+     * Calculates the wall height
+     * @param levelScene
+     * @return
+     */
     private int calculateWallHeight(final byte[][] levelScene) {
         int height = 0;
         for (int i = 11; i > 0 && levelScene[i][12] != Sprite.KIND_NONE; i--) {
@@ -37,6 +45,11 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
         return height;
     }
 
+    /**
+     * Detects gaps in front
+     * @param levelScene
+     * @return
+     */
     private boolean detectGap(final byte[][] levelScene) {
         for (int y = 12; y < levelScene.length; y++) {
             if (levelScene[y][12] != 0 && levelScene[y][13] != 0) {
@@ -46,6 +59,11 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
         return true;
     }
 
+    /**
+     * Detects enemies in front
+     * @param enemiesScene
+     * @return
+     */
     private boolean detectEnemiesFront(final byte[][] enemiesScene) {
 
         for (int i = 9; i <= 12; i++) {
@@ -57,6 +75,12 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
         }
         return false;
     }
+
+    /**
+     * Detects enemies above
+     * @param enemiesScene
+     * @return
+     */
     private boolean detectEnemiesAbove(final byte[][] enemiesScene) {
 
         for (int i = 5; i <= 11; i++) {
@@ -69,17 +93,21 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
         return false;
     }
 
-
-    private void jump(int size, JumpReason reason) {
+    /**
+     * Jumps height with reason
+     * @param height
+     * @param reason
+     */
+    private void jump(int height, JumpReason reason) {
         if (reason.equals(JumpReason.WALL)) {
-            jumpHeight = Math.max(4, size);
+            jumpHeight = Math.max(4, height);
         } else {
-            jumpHeight = size;
+            jumpHeight = height;
         }
         jumpCount = 0;
         jumpReason = reason;
     }
-/*comment*/
+
     @Override
     public void reset() {
         action = new boolean[Environment.numberOfButtons];
@@ -94,33 +122,41 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
         boolean enemyinFront = detectEnemiesFront(enemiesScene);
         boolean enemyAbove = detectEnemiesAbove(enemiesScene);
         boolean gap = detectGap(levelScene);
+
+        //calculate speed
         float speed = observation.getMarioFloatPos()[0] - previousX;
-//        System.out.println("Above: " +enemyAbove);
-//        if (enemyAbove) {
-//            for (int i = 0; i < 22; i++) {
-//                System.out.println(Arrays.toString(enemiesScene[i]));
-//            }
-//        }
+
         if ((observation.isMarioOnGround() || observation.mayMarioJump()) && !jumpReason.equals(JumpReason.NONE)) {
+            // no need to jump
             jump(-1, JumpReason.NONE);
         }
         else if (observation.mayMarioJump()) {
             int wallHeight = calculateWallHeight(levelScene);
             if (gap && speed > 0) {
+                // calculate gap width and jump
                 jump(speed < 6 ?(int)(9-speed):1, JumpReason.GAP);
             } else if (enemyinFront) {
+                // enemy detected, jump
                 jump(7, JumpReason.ENEMY);
             } else if (wallHeight > 0) {
+                // calculate wall height and jump
                 jump(wallHeight, JumpReason.WALL);
             }
         } else {
             jumpCount++;
         }
+        // see if falling
         boolean falling = previousY < observation.getMarioFloatPos()[1] && jumpReason.equals(JumpReason.NONE);
-        action[Mario.KEY_LEFT] = falling && (gap || (enemyAbove && enemyinFront));
-        action[Mario.KEY_JUMP] = jumpCount < jumpHeight && !jumpReason.equals(JumpReason.NONE);
-        action[Mario.KEY_SPEED] = !(observation.getMarioMode() != 2 && enemyinFront) && !(enemyinFront && action[Mario.KEY_SPEED] && observation.getMarioMode() == 2);
-        action[Mario.KEY_RIGHT] = !falling && !(enemyAbove && jumpReason.equals(JumpReason.WALL)) && !(gap && !(jumpReason.equals(JumpReason.GAP) || jumpReason.equals(JumpReason.NONE)));
+
+        // decide actions
+        action[Mario.KEY_LEFT] = falling && (gap || (enemyAbove && enemyinFront)); // need to slow down/go left
+        action[Mario.KEY_JUMP] = jumpCount < jumpHeight && !jumpReason.equals(JumpReason.NONE); // need to jump
+        action[Mario.KEY_SPEED] = !(observation.getMarioMode() != 2
+                                    && enemyinFront) && !(enemyinFront
+                                    && action[Mario.KEY_SPEED]); // need to shoot/run
+        action[Mario.KEY_RIGHT] = !falling && !(enemyAbove && jumpReason.equals(JumpReason.WALL))
+                                && !(gap && !(jumpReason.equals(JumpReason.GAP)
+                                || jumpReason.equals(JumpReason.NONE))); // need to proceed
         previousX = observation.getMarioFloatPos()[0];
         previousY = observation.getMarioFloatPos()[1];
         return action;
