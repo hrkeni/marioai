@@ -4,3 +4,4 @@ doc/
 out/
 .DS_Store
 *.jar
+*.zip
