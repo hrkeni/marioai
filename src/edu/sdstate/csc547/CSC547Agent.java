@@ -21,6 +21,7 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
     private int jumpHeight = -1;
     private float previousY = 0f;
     private float previousX = 0f;
+    private int stationaryTime = 0;
 
     private JumpReason jumpReason = JumpReason.NONE;
 
@@ -99,6 +100,7 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
      * @param reason
      */
     private void jump(int height, JumpReason reason) {
+//        System.out.println("Jumping: " +height + ", " + reason.toString());
         if (reason.equals(JumpReason.WALL)) {
             jumpHeight = Math.max(4, height);
         } else {
@@ -125,6 +127,11 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
 
         //calculate speed
         float speed = observation.getMarioFloatPos()[0] - previousX;
+        if (speed <= 0) {
+            stationaryTime++;
+        } else {
+            stationaryTime = 0;
+        }
 
         if ((observation.isMarioOnGround() || observation.mayMarioJump()) && !jumpReason.equals(JumpReason.NONE)) {
             // no need to jump
@@ -132,9 +139,12 @@ public class CSC547Agent extends BasicAIAgent implements Agent {
         }
         else if (observation.mayMarioJump()) {
             int wallHeight = calculateWallHeight(levelScene);
-            if (gap && speed > 0) {
+            if (stationaryTime > 30){
+                jump(9, JumpReason.WALL);
+            }
+            else if (gap && speed > 0) {
                 // calculate gap width and jump
-                jump(speed < 6 ?(int)(9-speed):1, JumpReason.GAP);
+                jump(speed < 6 ?(int)(9-speed):2, JumpReason.GAP);
             } else if (enemyinFront) {
                 // enemy detected, jump
                 jump(7, JumpReason.ENEMY);

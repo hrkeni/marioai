@@ -104,10 +104,10 @@ public class MainRun
         timeLeftSum = 0;
         marioModeSum = 0;
 
-//        competitionScore += testConfig (controller, options, startingSeed, 0, false);
         competitionScore += testConfig (controller, options, startingSeed, 0, false);
-//        competitionScore += testConfig (controller, options, startingSeed, 5, false);
-//        competitionScore += testConfig (controller, options, startingSeed, 10, false);
+        competitionScore += testConfig (controller, options, startingSeed, 3, false);
+        competitionScore += testConfig (controller, options, startingSeed, 5, false);
+        competitionScore += testConfig (controller, options, startingSeed, 10, false);
         System.out.println("Competition score: " + competitionScore);
         System.out.println("Total kills Sum = " + killsSum);
         System.out.println("marioStatus Sum  = " + marioStatusSum);
@@ -152,11 +152,11 @@ public class MainRun
             timeLeft += result.timeLeft;
             marioMode += result.marioMode;
             marioStatus += result.marioStatus;
-//            System.out.println("\ntrial # " + i);
-//            System.out.println("result.timeLeft = " + result.timeLeft);
-//            System.out.println("result.marioMode = " + result.marioMode);
-//            System.out.println("result.marioStatus = " + result.marioStatus);
-//            System.out.println("result.computeKillsTotal() = " + result.computeKillsTotal());
+            System.out.println("\ntrial # " + i);
+            System.out.println("result.timeLeft = " + result.timeLeft);
+            System.out.println("result.marioMode = " + result.marioMode);
+            System.out.println("result.marioStatus = " + result.marioStatus);
+            System.out.println("result.computeKillsTotal() = " + result.computeKillsTotal());
             ss.add (result.computeDistancePassed());
         }
 
